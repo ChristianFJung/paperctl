@@ -7,17 +7,17 @@
 ## Try it now
 
 ```bash
-npx -y @chrisjung/paperctl track "retrieval augmented generation"
+npx -y @christianfjung/paperctl track "retrieval augmented generation"
 ```
 
 ## Install
 
 ```bash
 # Zero-install (try it instantly)
-npx -y @chrisjung/paperctl --help
+npx -y @christianfjung/paperctl --help
 
 # Install globally
-npm install -g @chrisjung/paperctl
+npm install -g @christianfjung/paperctl
 
 # Or clone and link
 git clone <repo-url> && cd paperctl

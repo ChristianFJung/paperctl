@@ -1,5 +1,5 @@
 {
-  "name": "@chrisjung/paperctl",
+  "name": "@christianfjung/paperctl",
   "version": "0.1.0",
   "description": "AI-native research paper pipeline for the terminal",
   "type": "module",
