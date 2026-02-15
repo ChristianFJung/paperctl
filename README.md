@@ -107,6 +107,8 @@ paperctl search "diffusion" --json
 
 Generate an LLM summary for a paper. Requires `OPENAI_API_KEY`.
 
+> **Note:** This is a human convenience command — it costs API tokens per call. If you're an AI agent, use `paperctl show <id> --json` and synthesize from the abstract yourself.
+
 ```bash
 paperctl summarize 2401.12345
 paperctl summarize https://arxiv.org/abs/2401.12345
@@ -146,6 +148,8 @@ paperctl show 2401.12345 --json
 ### `paperctl digest [options]`
 
 Generate an AI-curated digest of recent papers. Requires `OPENAI_API_KEY`.
+
+> **Note:** Like `summarize`, this is a human convenience command that costs API tokens. Agents should use `paperctl list --json` and synthesize their own digest.
 
 ```bash
 paperctl digest                  # Last 7 days
