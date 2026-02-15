@@ -18,17 +18,11 @@ export async function searchArxiv(opts: {
   const maxResults = opts.maxResults || 50;
 
   // Build search query — search in title and abstract
+  // Note: We construct the URL manually because URLSearchParams
+  // double-encodes the + in AND operators, which arxiv rejects.
   const searchQuery = `all:${opts.query.replace(/\s+/g, "+AND+all:")}`;
 
-  const params = new URLSearchParams({
-    search_query: searchQuery,
-    start: "0",
-    max_results: String(maxResults),
-    sortBy: "submittedDate",
-    sortOrder: "descending",
-  });
-
-  const url = `${ARXIV_API}?${params.toString()}`;
+  const url = `${ARXIV_API}?search_query=${searchQuery}&start=0&max_results=${maxResults}&sortBy=submittedDate&sortOrder=descending`;
 
   const response = await fetch(url);
   if (!response.ok) {
