@@ -1,5 +1,5 @@
 {
-  "name": "paperctl",
+  "name": "@chrisjung/paperctl",
   "version": "0.1.0",
   "description": "AI-native research paper pipeline for the terminal",
   "type": "module",
@@ -7,18 +7,31 @@
   "bin": {
     "paperctl": "./bin/paperctl"
   },
+  "files": [
+    "src/",
+    "bin/",
+    "dist/",
+    "docs/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "esbuild src/index.ts --bundle --platform=node --target=node18 --outfile=dist/paperctl.js --format=esm --external:better-sqlite3",
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node22 --outfile=dist/paperctl.js --format=esm --external:better-sqlite3",
     "typecheck": "tsc --noEmit",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run lint && npm test && npm run build"
   },
-  "keywords": ["arxiv", "research", "papers", "ai", "cli"],
+  "keywords": ["arxiv", "research", "papers", "ai", "cli", "terminal"],
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "^11.0.0",

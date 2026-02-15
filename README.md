@@ -1,44 +1,57 @@
+![Banner](https://ghrb.waren.build/banner?header=paperctl&subheader=AI-native+research+paper+pipeline&bg=0d1117&color=f0f6fc&support=false)
+
 # paperctl
 
-> AI-native research paper pipeline for the terminal.
+> Track arxiv papers, generate AI summaries, and build a personal research knowledge base — from your terminal.
 
-Fetch papers from arxiv, generate summaries using LLMs, and build a personal research knowledge base. Like Zotero but for the terminal and AI-native.
+## Try it now
+
+```bash
+npx -y @chrisjung/paperctl track "retrieval augmented generation"
+```
 
 ## Install
 
 ```bash
-# Clone and install globally
-git clone <repo-url> && cd paperctl
-npm install
-npm install -g .
+# Zero-install (try it instantly)
+npx -y @chrisjung/paperctl --help
 
-# Or run directly with tsx
-npx tsx src/index.ts --help
+# Install globally
+npm install -g @chrisjung/paperctl
+
+# Or clone and link
+git clone <repo-url> && cd paperctl
+npm install && npm install -g .
 ```
+
+## Features
+
+- 📡 **Track topics** — follow arxiv categories and search terms
+- 📥 **Auto-fetch** — pull new papers matching your topics from arxiv
+- 🔍 **Full-text search** — search titles and abstracts in your local library
+- 🤖 **AI summaries** — generate LLM-powered paper summaries (optional, requires `OPENAI_API_KEY`)
+- 📰 **Weekly digests** — AI-curated digest of recent papers across your topics
+- 📊 **JSON output** — `--json` on every command for scripting and piping
+- 💾 **Offline-first** — SQLite-backed local library, works without internet after fetch
+- 📤 **Export** — dump your library as Markdown or JSON
 
 ## Quick Start
 
 ```bash
 # 1. Track topics you care about
 paperctl track "retrieval augmented generation"
-paperctl track "transformer architecture"
 
 # 2. Fetch recent papers from arxiv
 paperctl fetch --since 7d
 
-# 3. Browse your library
-paperctl list
+# 3. Search your local library
 paperctl search "attention mechanism"
 
-# 4. Dive into a specific paper
-paperctl show 2401.12345
+# 4. Dive into a paper
+paperctl show 2401.12345 --json
 
-# 5. Generate an AI summary (requires OPENAI_API_KEY)
-export OPENAI_API_KEY=sk-...
-paperctl summarize 2401.12345
-
-# 6. Get a weekly digest
-paperctl digest --since 7d
+# 5. Generate an AI summary (optional, costs tokens)
+OPENAI_API_KEY=sk-... paperctl summarize 2401.12345
 ```
 
 ## Commands
@@ -49,8 +62,6 @@ Add a topic to watch. Topics are used by `fetch` to query arxiv.
 
 ```bash
 paperctl track "retrieval augmented generation"
-# ✓ Now tracking: retrieval augmented generation
-
 paperctl track "chain of thought prompting"
 ```
 
@@ -58,24 +69,9 @@ paperctl track "chain of thought prompting"
 
 Remove a tracked topic.
 
-```bash
-paperctl untrack "chain of thought prompting"
-# ✓ Stopped tracking: chain of thought prompting
-```
-
 ### `paperctl topics`
 
-List all tracked topics.
-
-```bash
-paperctl topics
-# Tracked Topics:
-#   1. retrieval augmented generation (since 2024-01-15)
-#   2. transformer architecture (since 2024-01-20)
-
-paperctl topics --json
-# [{"id":1,"name":"retrieval augmented generation","created_at":"..."},...]
-```
+List all tracked topics. Supports `--json`.
 
 ### `paperctl fetch [options]`
 
@@ -87,11 +83,7 @@ paperctl fetch --since 30d               # Last 30 days
 paperctl fetch --topic "RAG" --limit 50  # Specific topic, max 50
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--since <duration>` | `7d` | How far back (e.g., `1d`, `7d`, `30d`) |
-| `--topic <topic>` | all | Fetch for one topic |
-| `--limit <n>` | `100` | Max papers per topic |
+Flags: `--since <duration>` (default `7d`), `--topic <topic>`, `--limit <n>` (default `100`).
 
 ### `paperctl search <query>`
 
@@ -99,42 +91,18 @@ Full-text search over titles and abstracts in your local library.
 
 ```bash
 paperctl search "attention mechanism"
-paperctl search "RLHF" --limit 10
-paperctl search "diffusion" --json
+paperctl search "RLHF" --json
 ```
-
-### `paperctl summarize <arxiv-id|url>`
-
-Generate an LLM summary for a paper. Requires `OPENAI_API_KEY`.
-
-> **Note:** This is a human convenience command — it costs API tokens per call. If you're an AI agent, use `paperctl show <id> --json` and synthesize from the abstract yourself.
-
-```bash
-paperctl summarize 2401.12345
-paperctl summarize https://arxiv.org/abs/2401.12345
-paperctl summarize 2401.12345 --refresh        # Re-generate
-paperctl summarize 2401.12345 --model gpt-4o   # Use a different model
-```
-
-Papers not yet in your library are fetched automatically.
 
 ### `paperctl list [options]`
 
-List papers in your library.
+List papers in your library. Supports filtering by topic, date, and sorting.
 
 ```bash
-paperctl list                            # Most recent 20
-paperctl list --topic "RAG" --since 30d  # Filter by topic + date
-paperctl list --sort title --limit 50    # Sort by title
-paperctl list --json                     # Machine-readable
+paperctl list --topic "RAG" --since 30d --json
 ```
 
-| Flag | Default | Description |
-|------|---------|-------------|
-| `--topic <topic>` | all | Filter by topic |
-| `--since <duration>` | — | Filter by date |
-| `--limit <n>` | `20` | Max results |
-| `--sort <field>` | `published` | `published`, `fetched`, `title` |
+Flags: `--topic`, `--since`, `--limit` (default `20`), `--sort` (`published`|`fetched`|`title`).
 
 ### `paperctl show <id>`
 
@@ -142,19 +110,28 @@ Show full details for a paper including abstract and summary.
 
 ```bash
 paperctl show 2401.12345
-paperctl show 2401.12345 --json
+paperctl show 2401.12345 --json   # Structured output for agents
+```
+
+### `paperctl summarize <arxiv-id|url>`
+
+Generate an LLM summary for a paper. Requires `OPENAI_API_KEY`.
+
+> ⚠️ **Human-only command** — costs API tokens per call. AI agents should use `paperctl show <id> --json` and synthesize from the abstract.
+
+```bash
+paperctl summarize 2401.12345
+paperctl summarize 2401.12345 --model gpt-4o --refresh
 ```
 
 ### `paperctl digest [options]`
 
 Generate an AI-curated digest of recent papers. Requires `OPENAI_API_KEY`.
 
-> **Note:** Like `summarize`, this is a human convenience command that costs API tokens. Agents should use `paperctl list --json` and synthesize their own digest.
+> ⚠️ **Human-only command** — costs API tokens. Agents should use `paperctl list --json` and synthesize their own digest.
 
 ```bash
-paperctl digest                  # Last 7 days
-paperctl digest --since 30d     # Last month
-paperctl digest --topic "RAG"   # Focus on one topic
+paperctl digest --since 7d --topic "RAG"
 ```
 
 ### `paperctl export [options]`
@@ -162,21 +139,13 @@ paperctl digest --topic "RAG"   # Focus on one topic
 Export your library as Markdown or JSON.
 
 ```bash
-paperctl export > papers.md                          # Markdown (default)
-paperctl export --format json > papers.json          # JSON
-paperctl export --format json --topic "RAG" | jq .   # Filter + pipe
+paperctl export > papers.md
+paperctl export --format json | jq .
 ```
 
 ## Global Flags
 
-| Flag | Description |
-|------|-------------|
-| `--help`, `-h` | Show help |
-| `--version` | Print version |
-| `--json` | Machine-readable JSON output |
-| `--no-color` | Disable color output |
-| `-q`, `--quiet` | Suppress non-essential output |
-| `-v`, `--verbose` | Show debug/diagnostic info |
+`--help` / `-h`, `--version`, `--json`, `--no-color`, `--quiet` / `-q`, `--verbose` / `-v`
 
 ## Configuration
 
@@ -190,21 +159,9 @@ paperctl export --format json --topic "RAG" | jq .   # Filter + pipe
 
 ### Config File
 
-`~/.paperctl/config.json`:
+`~/.paperctl/config.json` — model, maxFetchPerTopic, defaultSinceDays.
 
-```json
-{
-  "model": "gpt-4o-mini",
-  "maxFetchPerTopic": 100,
-  "defaultSinceDays": 7
-}
-```
-
-### Precedence
-
-```
-flags > environment variables > config file > defaults
-```
+**Precedence:** flags > env vars > config file > defaults.
 
 ## Data Storage
 
@@ -212,31 +169,7 @@ All data lives in `~/.paperctl/`:
 - `paperctl.db` — SQLite database (papers, topics, summaries)
 - `config.json` — User preferences
 
-Works offline after initial fetch. Papers are stored locally.
-
-## Architecture
-
-- **Language:** TypeScript
-- **Storage:** SQLite via better-sqlite3
-- **Arxiv:** REST API at export.arxiv.org (no auth)
-- **LLM:** OpenAI API for summaries and digests
-- **Arg parsing:** Commander.js
-
-## Why This Exists
-
-Keeping up with AI research is overwhelming. arxiv gets hundreds of papers daily. This tool lets you:
-
-1. **Track** topics you care about
-2. **Fetch** papers automatically
-3. **Search** your personal library offline
-4. **Summarize** papers with AI when you need it (not wastefully on every paper)
-5. **Digest** recent work into a cohesive summary
-
-It's a terminal-native, AI-augmented research workflow.
-
-## License
-
-MIT
+Works offline after initial fetch.
 
 ## Development
 
@@ -250,4 +183,8 @@ npm run build                      # Bundle with esbuild
 npx tsx src/index.ts --help        # Run directly
 ```
 
-See [AGENTS.md](AGENTS.md) for coding conventions and architecture.
+See [AGENTS.md](AGENTS.md) for coding conventions and architecture details.
+
+## License
+
+MIT
