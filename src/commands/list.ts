@@ -1,15 +1,7 @@
 import type { Command } from "commander";
-import { listPapers, getTopicsForPaper } from "../lib/db.ts";
-import { parseSince, loadConfig } from "../lib/config.ts";
-import {
-  output,
-  bold,
-  dim,
-  cyan,
-  yellow,
-  formatDate,
-  truncate,
-} from "../lib/output.ts";
+import { loadConfig, parseSince } from "../lib/config.ts";
+import { getTopicsForPaper, listPapers } from "../lib/db.ts";
+import { bold, cyan, dim, formatDate, output, truncate, yellow } from "../lib/output.ts";
 
 export function registerListCommand(program: Command): void {
   program
@@ -21,7 +13,7 @@ export function registerListCommand(program: Command): void {
     .option("--sort <field>", "Sort by: published, fetched, title", "published")
     .action((opts, cmd) => {
       const globalOpts = cmd.optsWithGlobals();
-      const limit = parseInt(opts.limit, 10);
+      const limit = Number.parseInt(opts.limit, 10);
       const since = opts.since ? parseSince(opts.since) : undefined;
 
       const papers = listPapers({
@@ -46,27 +38,23 @@ export function registerListCommand(program: Command): void {
       }
 
       if (papers.length === 0) {
-        output(
-          "No papers in library. Use `paperctl fetch` to get papers from arxiv."
-        );
+        output("No papers in library. Use `paperctl fetch` to get papers from arxiv.");
         return;
       }
 
       const header = opts.topic
         ? `Papers — ${opts.topic}`
         : `Papers (${papers.length} most recent)`;
-      output(bold(header) + "\n");
+      output(`${bold(header)}\n`);
 
       for (const p of papers) {
-        const summaryBadge = p.summary
-          ? yellow(" ★ summarized")
-          : "";
+        const summaryBadge = p.summary ? yellow(" ★ summarized") : "";
         const topics = getTopicsForPaper(p.id)
           .map((t) => t.name)
           .join(", ");
 
         output(
-          `  ${cyan(p.arxiv_id)}  ${truncate(p.title, 55)}  ${dim(formatDate(p.published))}${summaryBadge}`
+          `  ${cyan(p.arxiv_id)}  ${truncate(p.title, 55)}  ${dim(formatDate(p.published))}${summaryBadge}`,
         );
         if (topics) {
           output(`  ${dim(`Topics: ${topics}`)}`);

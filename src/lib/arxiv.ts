@@ -26,9 +26,7 @@ export async function searchArxiv(opts: {
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(
-      `Arxiv API error: ${response.status} ${response.statusText}`
-    );
+    throw new Error(`Arxiv API error: ${response.status} ${response.statusText}`);
   }
 
   const xml = await response.text();
@@ -46,17 +44,13 @@ export async function searchArxiv(opts: {
 /**
  * Fetch a single paper by arxiv ID
  */
-export async function fetchPaperById(
-  arxivId: string
-): Promise<ArxivEntry | null> {
+export async function fetchPaperById(arxivId: string): Promise<ArxivEntry | null> {
   const cleanId = normalizeArxivId(arxivId);
   const url = `${ARXIV_API}?id_list=${cleanId}`;
 
   const response = await fetch(url);
   if (!response.ok) {
-    throw new Error(
-      `Arxiv API error: ${response.status} ${response.statusText}`
-    );
+    throw new Error(`Arxiv API error: ${response.status} ${response.statusText}`);
   }
 
   const xml = await response.text();
@@ -69,9 +63,7 @@ export async function fetchPaperById(
  */
 export function normalizeArxivId(ref: string): string {
   // Handle full URLs
-  const urlMatch = ref.match(
-    /arxiv\.org\/(?:abs|pdf)\/(\d{4}\.\d{4,5}(?:v\d+)?)/
-  );
+  const urlMatch = ref.match(/arxiv\.org\/(?:abs|pdf)\/(\d{4}\.\d{4,5}(?:v\d+)?)/);
   if (urlMatch) return urlMatch[1];
 
   // Handle bare IDs
@@ -79,9 +71,7 @@ export function normalizeArxivId(ref: string): string {
   if (idMatch) return idMatch[1];
 
   // Handle old-style IDs like hep-ph/9905221
-  const oldMatch = ref.match(
-    /(?:arxiv\.org\/(?:abs|pdf)\/)?([\w-]+\/\d{7}(?:v\d+)?)/
-  );
+  const oldMatch = ref.match(/(?:arxiv\.org\/(?:abs|pdf)\/)?([\w-]+\/\d{7}(?:v\d+)?)/);
   if (oldMatch) return oldMatch[1];
 
   return ref; // Return as-is, let API handle validation
@@ -95,8 +85,7 @@ function parseAtomFeed(xml: string): ArxivEntry[] {
   const entries: ArxivEntry[] = [];
   const entryRegex = /<entry>([\s\S]*?)<\/entry>/g;
 
-  let match;
-  while ((match = entryRegex.exec(xml)) !== null) {
+  for (const match of xml.matchAll(entryRegex)) {
     const entry = match[1];
 
     const id = extractTag(entry, "id");
@@ -107,31 +96,20 @@ function parseAtomFeed(xml: string): ArxivEntry[] {
 
     const arxivId = normalizeArxivId(id);
     const title = extractTag(entry, "title")?.replace(/\s+/g, " ").trim() || "";
-    const abstract =
-      extractTag(entry, "summary")?.replace(/\s+/g, " ").trim() || "";
+    const abstract = extractTag(entry, "summary")?.replace(/\s+/g, " ").trim() || "";
     const published = extractTag(entry, "published") || "";
     const updated = extractTag(entry, "updated") || "";
 
     // Extract authors
     const authorRegex = /<author>\s*<name>(.*?)<\/name>/g;
-    const authors: string[] = [];
-    let authorMatch;
-    while ((authorMatch = authorRegex.exec(entry)) !== null) {
-      authors.push(authorMatch[1].trim());
-    }
+    const authors = [...entry.matchAll(authorRegex)].map((m) => m[1].trim());
 
     // Extract categories
     const catRegex = /<category[^>]*term="([^"]+)"/g;
-    const categories: string[] = [];
-    let catMatch;
-    while ((catMatch = catRegex.exec(entry)) !== null) {
-      categories.push(catMatch[1]);
-    }
+    const categories = [...entry.matchAll(catRegex)].map((m) => m[1]);
 
     // Extract PDF link
-    const pdfMatch = entry.match(
-      /<link[^>]*title="pdf"[^>]*href="([^"]+)"/
-    );
+    const pdfMatch = entry.match(/<link[^>]*title="pdf"[^>]*href="([^"]+)"/);
     const pdfUrl = pdfMatch ? pdfMatch[1] : "";
 
     const url = `https://arxiv.org/abs/${arxivId}`;

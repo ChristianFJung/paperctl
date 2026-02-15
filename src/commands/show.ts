@@ -1,15 +1,7 @@
 import type { Command } from "commander";
-import { getPaper, getTopicsForPaper } from "../lib/db.ts";
 import { normalizeArxivId } from "../lib/arxiv.ts";
-import {
-  output,
-  bold,
-  dim,
-  cyan,
-  yellow,
-  formatDate,
-  error,
-} from "../lib/output.ts";
+import { getPaper, getTopicsForPaper } from "../lib/db.ts";
+import { bold, cyan, dim, error, formatDate, output, yellow } from "../lib/output.ts";
 
 export function registerShowCommand(program: Command): void {
   program
@@ -23,7 +15,7 @@ export function registerShowCommand(program: Command): void {
 
       if (!paper) {
         error(
-          `Paper not found: ${arxivId}. Fetch it first or use \`paperctl summarize ${arxivId}\`.`
+          `Paper not found: ${arxivId}. Fetch it first or use \`paperctl summarize ${arxivId}\`.`,
         );
         process.exit(1);
       }
@@ -57,7 +49,9 @@ export function registerShowCommand(program: Command): void {
       output("");
 
       if (paper.summary) {
-        output(`  ${bold("Summary:")} ${dim(`(${paper.summary_model}, ${formatDate(paper.summarized_at || "")})`)}`);
+        output(
+          `  ${bold("Summary:")} ${dim(`(${paper.summary_model}, ${formatDate(paper.summarized_at || "")})`)}`,
+        );
         output("");
         // Indent summary lines
         paper.summary.split("\n").forEach((line) => {
@@ -66,7 +60,7 @@ export function registerShowCommand(program: Command): void {
         output("");
       } else {
         output(
-          `  ${yellow("No summary yet.")} Run: ${cyan(`paperctl summarize ${paper.arxiv_id}`)}`
+          `  ${yellow("No summary yet.")} Run: ${cyan(`paperctl summarize ${paper.arxiv_id}`)}`,
         );
         output("");
       }

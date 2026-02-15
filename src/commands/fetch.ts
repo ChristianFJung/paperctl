@@ -1,13 +1,8 @@
 import type { Command } from "commander";
 import { searchArxiv } from "../lib/arxiv.ts";
-import {
-  listTopics,
-  upsertPaper,
-  linkPaperTopic,
-  getTopicByName,
-} from "../lib/db.ts";
-import { parseSince, loadConfig } from "../lib/config.ts";
-import { info, success, error, output, bold } from "../lib/output.ts";
+import { loadConfig, parseSince } from "../lib/config.ts";
+import { getTopicByName, linkPaperTopic, listTopics, upsertPaper } from "../lib/db.ts";
+import { bold, error, info, output, success } from "../lib/output.ts";
 
 export function registerFetchCommand(program: Command): void {
   program
@@ -21,7 +16,7 @@ export function registerFetchCommand(program: Command): void {
       const config = loadConfig();
       const since = opts.since || `${config.defaultSinceDays}d`;
       const sinceDate = parseSince(since);
-      const limit = parseInt(opts.limit, 10);
+      const limit = Number.parseInt(opts.limit, 10);
 
       let topics = listTopics();
       if (opts.topic) {
@@ -37,17 +32,13 @@ export function registerFetchCommand(program: Command): void {
         if (globalOpts.json) {
           output({ ok: false, error: "No topics tracked" });
         } else {
-          error(
-            "No topics tracked. Use `paperctl track <topic>` to add one first."
-          );
+          error("No topics tracked. Use `paperctl track <topic>` to add one first.");
         }
         process.exit(1);
       }
 
       if (!globalOpts.quiet && !globalOpts.json) {
-        info(
-          `Fetching papers for ${bold(String(topics.length))} topic(s) since ${since}...\n`
-        );
+        info(`Fetching papers for ${bold(String(topics.length))} topic(s) since ${since}...\n`);
       }
 
       let totalAdded = 0;
@@ -99,8 +90,7 @@ export function registerFetchCommand(program: Command): void {
             info(`  ${topic.name}: ${added} new papers (${skipped} existing)`);
           }
         } catch (err) {
-          const msg =
-            err instanceof Error ? err.message : String(err);
+          const msg = err instanceof Error ? err.message : String(err);
           error(`Failed to fetch for "${topic.name}": ${msg}`);
           results.push({ topic: topic.name, added: 0, skipped: 0 });
         }
@@ -115,9 +105,7 @@ export function registerFetchCommand(program: Command): void {
         });
       } else if (!globalOpts.quiet) {
         console.log("");
-        success(
-          `${totalAdded} papers added (${totalSkipped} duplicates skipped)`
-        );
+        success(`${totalAdded} papers added (${totalSkipped} duplicates skipped)`);
       }
     });
 }

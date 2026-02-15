@@ -3,15 +3,15 @@
  */
 
 import OpenAI from "openai";
-import { resolveModel } from "./config.ts";
 import type { Paper } from "../types.ts";
+import { resolveModel } from "./config.ts";
 
 function getClient(): OpenAI {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error(
       "OPENAI_API_KEY environment variable is required.\n" +
-        "Set it with: export OPENAI_API_KEY=sk-..."
+        "Set it with: export OPENAI_API_KEY=sk-...",
     );
   }
   return new OpenAI({ apiKey });
@@ -20,10 +20,7 @@ function getClient(): OpenAI {
 /**
  * Generate a summary for a single paper
  */
-export async function summarizePaper(
-  paper: Paper,
-  modelFlag?: string
-): Promise<string> {
+export async function summarizePaper(paper: Paper, modelFlag?: string): Promise<string> {
   const client = getClient();
   const model = resolveModel(modelFlag);
 
@@ -65,17 +62,14 @@ Keep it concise but informative. Write for a technical audience.`;
 /**
  * Generate a digest from multiple papers
  */
-export async function generateDigest(
-  papers: Paper[],
-  modelFlag?: string
-): Promise<string> {
+export async function generateDigest(papers: Paper[], modelFlag?: string): Promise<string> {
   const client = getClient();
   const model = resolveModel(modelFlag);
 
   const paperList = papers
     .map(
       (p, i) =>
-        `${i + 1}. [${p.arxiv_id}] "${p.title}"\n   Authors: ${p.authors}\n   Abstract: ${p.abstract.slice(0, 300)}...`
+        `${i + 1}. [${p.arxiv_id}] "${p.title}"\n   Authors: ${p.authors}\n   Abstract: ${p.abstract.slice(0, 300)}...`,
     )
     .join("\n\n");
 

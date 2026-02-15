@@ -1,7 +1,7 @@
 import type { Command } from "commander";
-import { listPapers, getTopicsForPaper } from "../lib/db.ts";
 import { parseSince } from "../lib/config.ts";
-import { output, error, formatDate } from "../lib/output.ts";
+import { getTopicsForPaper, listPapers } from "../lib/db.ts";
+import { error, formatDate, output } from "../lib/output.ts";
 
 export function registerExportCommand(program: Command): void {
   program
@@ -45,9 +45,11 @@ export function registerExportCommand(program: Command): void {
       } else {
         // Markdown format
         const lines: string[] = [];
-        lines.push(`# Paper Library Export`);
+        lines.push("# Paper Library Export");
         lines.push("");
-        lines.push(`> ${papers.length} papers exported on ${new Date().toISOString().split("T")[0]}`);
+        lines.push(
+          `> ${papers.length} papers exported on ${new Date().toISOString().split("T")[0]}`,
+        );
         lines.push("");
 
         for (const p of papers) {
@@ -66,13 +68,13 @@ export function registerExportCommand(program: Command): void {
             lines.push(`- **Topics:** ${topics}`);
           }
           lines.push("");
-          lines.push(`### Abstract`);
+          lines.push("### Abstract");
           lines.push("");
           lines.push(p.abstract);
           lines.push("");
 
           if (p.summary) {
-            lines.push(`### Summary`);
+            lines.push("### Summary");
             lines.push("");
             lines.push(p.summary);
             lines.push("");

@@ -233,3 +233,17 @@ It's a terminal-native, AI-augmented research workflow.
 ## License
 
 MIT
+
+## Development
+
+```bash
+npm install                        # Install dependencies
+npm run typecheck                  # Type check
+npm run lint                       # Lint (biome)
+npm run lint:fix                   # Lint + auto-fix
+npm test                           # Run tests (vitest)
+npm run build                      # Bundle with esbuild
+npx tsx src/index.ts --help        # Run directly
+```
+
+See [AGENTS.md](AGENTS.md) for coding conventions and architecture.

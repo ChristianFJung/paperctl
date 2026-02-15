@@ -2,7 +2,7 @@
  * TTY detection, color support, and output formatting
  */
 
-import { WriteStream } from "tty";
+import type { WriteStream } from "node:tty";
 
 let _noColor = false;
 
@@ -31,26 +31,26 @@ export const magenta = esc("35");
 
 // Output helpers
 export function info(msg: string): void {
-  process.stderr.write(msg + "\n");
+  process.stderr.write(`${msg}\n`);
 }
 
 export function success(msg: string): void {
-  process.stderr.write(green("✓") + " " + msg + "\n");
+  process.stderr.write(`${green("✓")} ${msg}\n`);
 }
 
 export function warn(msg: string): void {
-  process.stderr.write(yellow("⚠") + " " + msg + "\n");
+  process.stderr.write(`${yellow("⚠")} ${msg}\n`);
 }
 
 export function error(msg: string): void {
-  process.stderr.write(red("✗") + " " + msg + "\n");
+  process.stderr.write(`${red("✗")} ${msg}\n`);
 }
 
 export function output(data: unknown): void {
   if (typeof data === "string") {
-    process.stdout.write(data + "\n");
+    process.stdout.write(`${data}\n`);
   } else {
-    process.stdout.write(JSON.stringify(data, null, 2) + "\n");
+    process.stdout.write(`${JSON.stringify(data, null, 2)}\n`);
   }
 }
 
@@ -59,7 +59,7 @@ export function output(data: unknown): void {
  */
 export function truncate(str: string, maxLen: number): string {
   if (str.length <= maxLen) return str;
-  return str.slice(0, maxLen - 3) + "...";
+  return `${str.slice(0, maxLen - 3)}...`;
 }
 
 /**

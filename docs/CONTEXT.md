@@ -23,6 +23,24 @@
 ## File Map
 
 ```
+├── AGENTS.md              # Agent instructions (read this first)
+├── CLAUDE.md              # Redirects to AGENTS.md
+├── CHANGELOG.md           # Version history
+├── LICENSE                # MIT
+├── biome.json             # Linter/formatter config
+├── vitest.config.ts       # Test config
+├── .github/workflows/ci.yml  # GitHub Actions CI
+├── scripts/
+│   ├── lint.sh            # Run linter
+│   └── test.sh            # Run tests
+├── tests/
+│   ├── arxiv.test.ts      # normalizeArxivId tests
+│   ├── config.test.ts     # parseSince tests
+│   └── cli.test.ts        # Smoke tests (--help, --version)
+├── docs/
+│   ├── CLI-SPEC.md        # Full CLI specification
+│   ├── CONTEXT.md         # This file
+│   └── ARCHITECTURE.md    # System architecture overview
 src/
 ├── index.ts           # Entry point, Commander setup, signal handlers
 ├── types.ts           # Shared TypeScript interfaces
@@ -85,10 +103,11 @@ if (globalOpts.json) {
 - **No build step needed**: Run via `npx tsx src/index.ts`
 - **Global install**: `npm install -g .` then `paperctl`
 
-## Testing Notes
+## Testing
 
-- No test framework yet — good area for contribution
-- Manual testing: `track` → `fetch` → `list` → `show` → `summarize`
+- **Framework:** vitest (`npm test`)
+- **Test files:** `tests/*.test.ts`
+- **Smoke test:** `bin/paperctl --help` should exit 0
 - `summarize` and `digest` need `OPENAI_API_KEY` set
 - Arxiv API doesn't need auth but has rate limits
 

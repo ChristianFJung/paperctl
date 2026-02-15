@@ -1,6 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
-import { homedir } from "os";
-import { join } from "path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
 import type { Config } from "../types.ts";
 
 const DATA_DIR = join(homedir(), ".paperctl");
@@ -39,7 +39,7 @@ export function loadConfig(): Config {
 
 export function saveConfig(config: Config): void {
   getDataDir();
-  writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2) + "\n");
+  writeFileSync(CONFIG_FILE, `${JSON.stringify(config, null, 2)}\n`);
 }
 
 /**
@@ -59,11 +59,9 @@ export function resolveModel(flagModel?: string): string {
 export function parseSince(since: string): Date {
   const match = since.match(/^(\d+)d$/);
   if (!match) {
-    throw new Error(
-      `Invalid duration format: "${since}". Use format like "7d", "30d".`
-    );
+    throw new Error(`Invalid duration format: "${since}". Use format like "7d", "30d".`);
   }
-  const days = parseInt(match[1], 10);
+  const days = Number.parseInt(match[1], 10);
   const date = new Date();
   date.setDate(date.getDate() - days);
   return date;

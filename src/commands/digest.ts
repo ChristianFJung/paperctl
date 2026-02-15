@@ -1,8 +1,8 @@
 import type { Command } from "commander";
+import { loadConfig, parseSince } from "../lib/config.ts";
 import { getPapersForDigest } from "../lib/db.ts";
 import { generateDigest } from "../lib/llm.ts";
-import { parseSince, loadConfig } from "../lib/config.ts";
-import { info, success, error, output, bold } from "../lib/output.ts";
+import { bold, error, info, output, success } from "../lib/output.ts";
 
 export function registerDigestCommand(program: Command): void {
   program
@@ -17,7 +17,7 @@ export function registerDigestCommand(program: Command): void {
       const config = loadConfig();
       const since = opts.since || `${config.defaultSinceDays}d`;
       const sinceDate = parseSince(since);
-      const limit = parseInt(opts.limit, 10);
+      const limit = Number.parseInt(opts.limit, 10);
 
       const papers = getPapersForDigest({
         since: sinceDate,
@@ -29,17 +29,13 @@ export function registerDigestCommand(program: Command): void {
         if (globalOpts.json) {
           output({ ok: false, error: "No papers found for digest" });
         } else {
-          error(
-            "No papers found in the given time window. Try `paperctl fetch` first."
-          );
+          error("No papers found in the given time window. Try `paperctl fetch` first.");
         }
         process.exit(1);
       }
 
       if (!globalOpts.quiet && !globalOpts.json) {
-        info(
-          `Generating digest from ${bold(String(papers.length))} papers (since ${since})...\n`
-        );
+        info(`Generating digest from ${bold(String(papers.length))} papers (since ${since})...\n`);
       }
 
       try {

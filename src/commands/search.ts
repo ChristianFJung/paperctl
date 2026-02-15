@@ -1,14 +1,6 @@
 import type { Command } from "commander";
-import { searchPapers, getTopicsForPaper } from "../lib/db.ts";
-import {
-  output,
-  bold,
-  dim,
-  cyan,
-  formatDate,
-  truncate,
-  error,
-} from "../lib/output.ts";
+import { getTopicsForPaper, searchPapers } from "../lib/db.ts";
+import { bold, cyan, dim, error, formatDate, output, truncate } from "../lib/output.ts";
 
 export function registerSearchCommand(program: Command): void {
   program
@@ -18,7 +10,7 @@ export function registerSearchCommand(program: Command): void {
     .option("--limit <n>", "Max results", "20")
     .action((query: string, opts, cmd) => {
       const globalOpts = cmd.optsWithGlobals();
-      const limit = parseInt(opts.limit, 10);
+      const limit = Number.parseInt(opts.limit, 10);
       const papers = searchPapers(query.trim(), limit);
 
       if (globalOpts.json) {
@@ -46,11 +38,9 @@ export function registerSearchCommand(program: Command): void {
           .map((t) => t.name)
           .join(", ");
         const summaryBadge = p.summary ? " ★" : "";
+        output(`  ${cyan(p.arxiv_id)}  ${truncate(p.title, 60)}${dim(summaryBadge)}`);
         output(
-          `  ${cyan(p.arxiv_id)}  ${truncate(p.title, 60)}${dim(summaryBadge)}`
-        );
-        output(
-          `  ${dim(`Published: ${formatDate(p.published)}`)}${topics ? dim(` | Topics: ${topics}`) : ""}`
+          `  ${dim(`Published: ${formatDate(p.published)}`)}${topics ? dim(` | Topics: ${topics}`) : ""}`,
         );
         output("");
       }

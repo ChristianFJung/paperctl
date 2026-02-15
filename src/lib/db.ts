@@ -1,7 +1,7 @@
+import { join } from "node:path";
 import Database from "better-sqlite3";
-import { join } from "path";
-import { getDataDir } from "./config.ts";
 import type { Paper, Topic } from "../types.ts";
+import { getDataDir } from "./config.ts";
 
 let _db: Database.Database | null = null;
 
@@ -62,15 +62,11 @@ function initSchema(db: Database.Database): void {
 
 export function addTopic(name: string): { created: boolean; topic: Topic } {
   const db = getDb();
-  const existing = db
-    .prepare("SELECT * FROM topics WHERE name = ?")
-    .get(name) as Topic | undefined;
+  const existing = db.prepare("SELECT * FROM topics WHERE name = ?").get(name) as Topic | undefined;
   if (existing) {
     return { created: false, topic: existing };
   }
-  const result = db
-    .prepare("INSERT INTO topics (name) VALUES (?)")
-    .run(name);
+  const result = db.prepare("INSERT INTO topics (name) VALUES (?)").run(name);
   const topic = db
     .prepare("SELECT * FROM topics WHERE id = ?")
     .get(result.lastInsertRowid) as Topic;
@@ -79,17 +75,13 @@ export function addTopic(name: string): { created: boolean; topic: Topic } {
 
 export function removeTopic(name: string): boolean {
   const db = getDb();
-  const result = db
-    .prepare("DELETE FROM topics WHERE name = ?")
-    .run(name);
+  const result = db.prepare("DELETE FROM topics WHERE name = ?").run(name);
   return result.changes > 0;
 }
 
 export function listTopics(): Topic[] {
   const db = getDb();
-  return db
-    .prepare("SELECT * FROM topics ORDER BY created_at ASC")
-    .all() as Topic[];
+  return db.prepare("SELECT * FROM topics ORDER BY created_at ASC").all() as Topic[];
 }
 
 // --- Paper operations ---
@@ -106,16 +98,16 @@ export function upsertPaper(paper: {
   pdf_url: string;
 }): { created: boolean; paper: Paper } {
   const db = getDb();
-  const existing = db
-    .prepare("SELECT * FROM papers WHERE arxiv_id = ?")
-    .get(paper.arxiv_id) as Paper | undefined;
+  const existing = db.prepare("SELECT * FROM papers WHERE arxiv_id = ?").get(paper.arxiv_id) as
+    | Paper
+    | undefined;
   if (existing) {
     return { created: false, paper: existing };
   }
   const result = db
     .prepare(
       `INSERT INTO papers (arxiv_id, title, abstract, authors, categories, published, updated, url, pdf_url)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       paper.arxiv_id,
@@ -126,7 +118,7 @@ export function upsertPaper(paper: {
       paper.published,
       paper.updated,
       paper.url,
-      paper.pdf_url
+      paper.pdf_url,
     );
   const created = db
     .prepare("SELECT * FROM papers WHERE id = ?")
@@ -136,16 +128,15 @@ export function upsertPaper(paper: {
 
 export function linkPaperTopic(paperId: number, topicId: number): void {
   const db = getDb();
-  db.prepare(
-    "INSERT OR IGNORE INTO paper_topics (paper_id, topic_id) VALUES (?, ?)"
-  ).run(paperId, topicId);
+  db.prepare("INSERT OR IGNORE INTO paper_topics (paper_id, topic_id) VALUES (?, ?)").run(
+    paperId,
+    topicId,
+  );
 }
 
 export function getPaper(arxivId: string): Paper | undefined {
   const db = getDb();
-  return db
-    .prepare("SELECT * FROM papers WHERE arxiv_id = ?")
-    .get(arxivId) as Paper | undefined;
+  return db.prepare("SELECT * FROM papers WHERE arxiv_id = ?").get(arxivId) as Paper | undefined;
 }
 
 export function listPapers(opts: {
@@ -161,8 +152,7 @@ export function listPapers(opts: {
   let query = "SELECT DISTINCT p.* FROM papers p";
 
   if (opts.topicName) {
-    query +=
-      " JOIN paper_topics pt ON p.id = pt.paper_id JOIN topics t ON pt.topic_id = t.id";
+    query += " JOIN paper_topics pt ON p.id = pt.paper_id JOIN topics t ON pt.topic_id = t.id";
     conditions.push("t.name = ?");
     params.push(opts.topicName);
   }
@@ -173,10 +163,11 @@ export function listPapers(opts: {
   }
 
   if (conditions.length > 0) {
-    query += " WHERE " + conditions.join(" AND ");
+    query += ` WHERE ${conditions.join(" AND ")}`;
   }
 
-  const sortField = opts.sort === "title" ? "p.title" : opts.sort === "fetched" ? "p.fetched_at" : "p.published";
+  const sortField =
+    opts.sort === "title" ? "p.title" : opts.sort === "fetched" ? "p.fetched_at" : "p.published";
   query += ` ORDER BY ${sortField} DESC`;
 
   if (opts.limit) {
@@ -187,7 +178,7 @@ export function listPapers(opts: {
   return db.prepare(query).all(...params) as Paper[];
 }
 
-export function searchPapers(query: string, limit: number = 20): Paper[] {
+export function searchPapers(query: string, limit = 20): Paper[] {
   const db = getDb();
   const pattern = `%${query}%`;
   return db
@@ -195,7 +186,7 @@ export function searchPapers(query: string, limit: number = 20): Paper[] {
       `SELECT * FROM papers
        WHERE title LIKE ? OR abstract LIKE ?
        ORDER BY published DESC
-       LIMIT ?`
+       LIMIT ?`,
     )
     .all(pattern, pattern, limit) as Paper[];
 }
@@ -206,20 +197,16 @@ export function getTopicsForPaper(paperId: number): Topic[] {
     .prepare(
       `SELECT t.* FROM topics t
        JOIN paper_topics pt ON t.id = pt.topic_id
-       WHERE pt.paper_id = ?`
+       WHERE pt.paper_id = ?`,
     )
     .all(paperId) as Topic[];
 }
 
-export function saveSummary(
-  arxivId: string,
-  summary: string,
-  model: string
-): void {
+export function saveSummary(arxivId: string, summary: string, model: string): void {
   const db = getDb();
   db.prepare(
     `UPDATE papers SET summary = ?, summarized_at = datetime('now'), summary_model = ?
-     WHERE arxiv_id = ?`
+     WHERE arxiv_id = ?`,
   ).run(summary, model, arxivId);
 }
 
@@ -238,7 +225,5 @@ export function getPapersForDigest(opts: {
 
 export function getTopicByName(name: string): Topic | undefined {
   const db = getDb();
-  return db
-    .prepare("SELECT * FROM topics WHERE name = ?")
-    .get(name) as Topic | undefined;
+  return db.prepare("SELECT * FROM topics WHERE name = ?").get(name) as Topic | undefined;
 }

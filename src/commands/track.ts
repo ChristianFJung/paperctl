@@ -1,14 +1,6 @@
 import type { Command } from "commander";
-import { addTopic, removeTopic, listTopics } from "../lib/db.ts";
-import {
-  success,
-  warn,
-  output,
-  formatDate,
-  bold,
-  dim,
-  cyan,
-} from "../lib/output.ts";
+import { addTopic, listTopics, removeTopic } from "../lib/db.ts";
+import { bold, cyan, dim, formatDate, output, success, warn } from "../lib/output.ts";
 
 export function registerTrackCommand(program: Command): void {
   program
@@ -65,7 +57,7 @@ export function registerTrackCommand(program: Command): void {
       output(bold("Tracked Topics:\n"));
       topics.forEach((t, i) => {
         output(
-          `  ${dim(`${i + 1}.`)} ${cyan(t.name)} ${dim(`(since ${formatDate(t.created_at)})`)}`
+          `  ${dim(`${i + 1}.`)} ${cyan(t.name)} ${dim(`(since ${formatDate(t.created_at)})`)}`,
         );
       });
     });

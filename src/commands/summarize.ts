@@ -1,8 +1,8 @@
 import type { Command } from "commander";
-import { getPaper, saveSummary, upsertPaper } from "../lib/db.ts";
 import { fetchPaperById, normalizeArxivId } from "../lib/arxiv.ts";
+import { getPaper, saveSummary, upsertPaper } from "../lib/db.ts";
 import { summarizePaper } from "../lib/llm.ts";
-import { info, success, error, output, bold } from "../lib/output.ts";
+import { bold, error, info, output, success } from "../lib/output.ts";
 
 export function registerSummarizeCommand(program: Command): void {
   program
@@ -20,7 +20,7 @@ export function registerSummarizeCommand(program: Command): void {
 
       if (!paper) {
         if (!globalOpts.quiet && !globalOpts.json) {
-          info(`Paper not in library. Fetching from arxiv...`);
+          info("Paper not in library. Fetching from arxiv...");
         }
 
         const entry = await fetchPaperById(arxivId);

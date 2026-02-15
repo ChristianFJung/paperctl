@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { setNoColor } from "./lib/output.ts";
-import { closeDb } from "./lib/db.ts";
-import { registerTrackCommand } from "./commands/track.ts";
-import { registerFetchCommand } from "./commands/fetch.ts";
-import { registerSearchCommand } from "./commands/search.ts";
-import { registerSummarizeCommand } from "./commands/summarize.ts";
-import { registerListCommand } from "./commands/list.ts";
-import { registerShowCommand } from "./commands/show.ts";
 import { registerDigestCommand } from "./commands/digest.ts";
 import { registerExportCommand } from "./commands/export.ts";
+import { registerFetchCommand } from "./commands/fetch.ts";
+import { registerListCommand } from "./commands/list.ts";
+import { registerSearchCommand } from "./commands/search.ts";
+import { registerShowCommand } from "./commands/show.ts";
+import { registerSummarizeCommand } from "./commands/summarize.ts";
+import { registerTrackCommand } from "./commands/track.ts";
+import { closeDb } from "./lib/db.ts";
+import { setNoColor } from "./lib/output.ts";
 
 const program = new Command();
 
@@ -25,7 +25,7 @@ program
       "  $ paperctl fetch --since 7d\n" +
       "  $ paperctl list\n" +
       "  $ paperctl summarize 2401.12345\n" +
-      "  $ paperctl digest --since 30d"
+      "  $ paperctl digest --since 30d",
   )
   .version("0.1.0", "--version", "Print version")
   .option("--json", "Output as JSON (machine-readable)")
