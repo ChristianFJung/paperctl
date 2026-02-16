@@ -69,6 +69,20 @@ src/
 
 ## Common Patterns
 
+### `show` supports multiple IDs
+
+`paperctl show <id1> <id2> ... --json` — returns a JSON array when multiple IDs given. Single ID returns the object directly (backwards compatible).
+
+### `list --json` includes `abstractLength`
+
+Each paper object includes `abstractLength` (character count) so agents can prioritize which papers to `show` without fetching all abstracts.
+
+### Exit codes
+
+- **0** — success with results
+- **2** — success but no results (empty search/list/fetch)
+- **1** — error
+
 ### Adding a new command
 
 1. Create `src/commands/mycommand.ts`

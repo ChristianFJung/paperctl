@@ -32,6 +32,7 @@ npm install && npm install -g .
 - 🤖 **AI summaries** — generate LLM-powered paper summaries (optional, requires `OPENAI_API_KEY`)
 - 📰 **Weekly digests** — AI-curated digest of recent papers across your topics
 - 📊 **JSON output** — `--json` on every command for scripting and piping
+- 📦 **Batch operations** — `show` accepts multiple IDs, `list --json` includes `abstractLength` for prioritization
 - 💾 **Offline-first** — SQLite-backed local library, works without internet after fetch
 - 📤 **Export** — dump your library as Markdown or JSON
 
@@ -104,13 +105,13 @@ paperctl list --topic "RAG" --since 30d --json
 
 Flags: `--topic`, `--since`, `--limit` (default `20`), `--sort` (`published`|`fetched`|`title`).
 
-### `paperctl show <id>`
+### `paperctl show <ids...>`
 
-Show full details for a paper including abstract and summary.
+Show full details for one or more papers. Supports multiple IDs for batch retrieval.
 
 ```bash
 paperctl show 2401.12345
-paperctl show 2401.12345 --json   # Structured output for agents
+paperctl show 2401.12345 2401.67890 2402.11111 --json   # Batch get
 ```
 
 ### `paperctl summarize <arxiv-id|url>`
