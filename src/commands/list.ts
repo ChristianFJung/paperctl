@@ -31,15 +31,19 @@ export function registerListCommand(program: Command): void {
           published: p.published,
           url: p.url,
           has_summary: !!p.summary,
+          abstractLength: p.abstract.length,
           topics: getTopicsForPaper(p.id).map((t) => t.name),
         }));
         output(results);
+        if (results.length === 0) {
+          process.exit(2);
+        }
         return;
       }
 
       if (papers.length === 0) {
         output("No papers in library. Use `paperctl fetch` to get papers from arxiv.");
-        return;
+        process.exit(2);
       }
 
       const header = opts.topic

@@ -7,15 +7,7 @@
   "bin": {
     "paperctl": "./bin/paperctl"
   },
-  "files": [
-    "src/",
-    "bin/",
-    "dist/",
-    "docs/",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
-  ],
+  "files": ["src/", "bin/", "dist/", "docs/", "README.md", "LICENSE", "CHANGELOG.md"],
   "engines": {
     "node": ">=22"
   },

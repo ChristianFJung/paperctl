@@ -24,12 +24,15 @@ export function registerSearchCommand(program: Command): void {
           topics: getTopicsForPaper(p.id).map((t) => t.name),
         }));
         output(results);
+        if (results.length === 0) {
+          process.exit(2);
+        }
         return;
       }
 
       if (papers.length === 0) {
         error(`No papers found matching "${query}".`);
-        return;
+        process.exit(2);
       }
 
       output(bold(`Found ${papers.length} paper(s):\n`));

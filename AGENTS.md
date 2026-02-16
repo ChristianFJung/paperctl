@@ -2,7 +2,35 @@
 
 > AI-native research paper pipeline for the terminal. TypeScript, Node.js, commander, better-sqlite3, OpenAI.
 
-## Essential Commands
+## Agent Usage Patterns
+
+### Recommended Workflow
+
+1. `paperctl track "<topic>"` → add topics to track
+2. `paperctl fetch --since 7d` → pull papers from arxiv
+3. `paperctl list --topic "<topic>" --json` → browse papers (includes `abstractLength` for prioritization)
+4. `paperctl show <id> --json` → get full abstract + metadata for one paper
+5. `paperctl show <id1> <id2> <id3> --json` → batch get multiple papers (returns JSON array)
+
+### Token-Aware Commands
+
+- ⚠️ `summarize` and `digest` cost OpenAI tokens — read abstracts via `show --json` and synthesize yourself
+- ✅ All other commands are free/local
+
+### Tips
+
+- **Always use `--json`** for structured, parseable output
+- Use `search <query>` for keyword matching across your local library
+- Use `export --format json` to dump everything at once
+- **Exit code 2** = no results found (distinct from error). `search`, `list`, and `fetch` return exit code 2 when zero results are found. `--json` still outputs `[]` or `{added: 0}` before exiting.
+- `list --json` includes `abstractLength` (character count) so you can decide which papers to `show` without fetching all abstracts
+- Use `--limit` on `list` and `search` to control result count
+
+---
+
+## Contributing / Development
+
+### Essential Commands
 
 ```bash
 npm install                        # Install deps
@@ -68,13 +96,3 @@ scripts/                  # Automation scripts (lint, test)
 - **Naming:** `tests/<module>.test.ts`
 - Test pure functions (parsers, normalizers). Mock network + filesystem.
 - Smoke test: `bin/paperctl --help` should exit 0.
-
-## Agent-Specific Guidance
-
-⚠️ **Do NOT use `paperctl summarize`** — it burns OpenAI API tokens to generate a human-readable summary. You can synthesize from the abstract yourself.
-
-**Instead:** `paperctl show <id> --json` gives you the title, abstract, authors, and metadata. Read the abstract and synthesize.
-
-**`summarize` and `digest` are human convenience commands, not agent tools.**
-
-**Always prefer `--json`** on all commands for structured, parseable output.

@@ -103,9 +103,15 @@ export function registerFetchCommand(program: Command): void {
           skipped: totalSkipped,
           topics: results,
         });
+        if (totalAdded === 0) {
+          process.exit(2);
+        }
       } else if (!globalOpts.quiet) {
         console.log("");
         success(`${totalAdded} papers added (${totalSkipped} duplicates skipped)`);
+        if (totalAdded === 0) {
+          process.exit(2);
+        }
       }
     });
 }
