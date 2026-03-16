@@ -20,7 +20,7 @@ npx -y @christianfjung/paperctl --help
 npm install -g @christianfjung/paperctl
 
 # Or clone and link
-git clone <repo-url> && cd paperctl
+git clone https://github.com/ChristianFJung/paperctl && cd paperctl
 npm install && npm install -g .
 ```
 
